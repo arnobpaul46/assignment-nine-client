@@ -1,12 +1,27 @@
 "use client"; 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Activity, Menu, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Activity, Menu, X, LogOut, User } from 'lucide-react';
+import { authClient } from '@/lib/auth-client'; // আপনার ক্লায়েন্ট পাথ নিশ্চিত করুন
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  
+  // BetterAuth থেকে সেশন এবং ইউজার ডাটা নেওয়া
+  const { data: session, isPending } = authClient.useSession();
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+        fetchOptions: {
+            onSuccess: () => {
+                router.push("/login"); // লগআউট হলে লগইন পেজে পাঠিয়ে দিবে
+            },
+        },
+    });
+  };
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -16,96 +31,106 @@ const Navbar = () => {
 
   return (
     <nav className="bg-[#050816] text-white w-full border-b border-gray-800 sticky top-0 z-50">
-      <div className="max-w-[80%] mx-auto">
+      <div className="max-w-[80%] mx-auto px-2">
         <div className="flex items-center justify-between h-20">
           
-          
-          <Link href="/" className="flex items-center gap-2 shrink-0 group">
-            <Activity className="text-[#21B7E2] w-8 h-8 group-hover:scale-110 transition-transform" />
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Activity className="text-[#21B7E2] w-8 h-8" />
             <span className="text-xl font-bold tracking-tight">DocAppoint</span>
           </Link>
 
-          
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-8 h-full">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link 
                   key={link.name}
                   href={link.href} 
-                  className={`relative text-sm font-bold transition-all duration-300 py-1 ${
+                  className={`relative flex items-center h-full text-sm font-bold transition-all duration-300 ${
                     isActive ? 'text-[#21B7E2]' : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   {link.name}
-                  
                   {isActive && (
-                    <span className="absolute bottom-[-6px] left-0 w-full h-[2px] bg-[#21B7E2] shadow-[0_0_8px_#21B7E2]"></span>
+                    <span className="absolute bottom-0 left-0 w-full h-[2px] bg-[#21B7E2] shadow-[0_0_8px_#21B7E2]"></span>
                   )}
                 </Link>
               );
             })}
           </div>
 
-          
-          <div className="hidden md:flex items-center gap-5">
-            
-            <Link 
-              href="/login" 
-              className={`text-sm font-bold px-5 py-2 rounded-full border transition-all duration-300 ${
-                pathname === '/login' 
-                ? 'border-[#21B7E2] text-[#21B7E2] bg-[#21B7E2]/5' 
-                : 'border-gray-700 text-gray-300 hover:border-[#21B7E2] hover:text-white'
-              }`}
-            >
-              Login
-            </Link>
+          {/* Auth Section */}
+          <div className="hidden md:flex items-center gap-6">
+            {isPending ? (
+              <div className="w-8 h-8 rounded-full bg-gray-800 animate-pulse"></div>
+            ) : session ? (
+              /* লগইন অবস্থায় যা দেখাবে */
+              <div className="flex items-center gap-5">
+                <Link href="/dashboard" className="flex items-center gap-2 group">
+                  <div className="w-10 h-10 rounded-full border-2 border-[#21B7E2] overflow-hidden group-hover:scale-105 transition-all">
+                    {session.user.image ? (
+                      <img src={session.user.image} alt="User" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-[#0a0f20] flex items-center justify-center">
+                        <User size={20} className="text-gray-500" />
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-sm font-bold text-gray-300 group-hover:text-white transition-colors">{session.user.name.split(' ')[0]}</span>
+                </Link>
 
-            
-            <Link 
-              href="/register" 
-              className="bg-[#21B7E2] hover:bg-white text-[#050816] px-6 py-2.5 rounded-full font-bold text-sm transition-all transform active:scale-95 shadow-lg shadow-cyan-500/10"
-            >
-              Register
-            </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-gray-400 hover:text-red-500 font-bold text-sm transition-all"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              /* লগআউট অবস্থায় যা দেখাবে */
+              <div className="flex items-center gap-5">
+                <Link href="/login" className="text-sm font-bold text-gray-400 hover:text-white transition-colors">
+                  Login
+                </Link>
+                <Link href="/register" className="bg-[#21B7E2] text-[#050816] px-6 py-2.5 rounded-full font-bold text-sm hover:bg-white transition-all shadow-lg shadow-cyan-500/10">
+                  Register
+                </Link>
+              </div>
+            )}
           </div>
 
-          
-          <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-2 hover:cursor-pointer">
+          {/* Mobile menu icon */}
+          <div className="md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-2">
               {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
 
-        
+        {/* Mobile menu */}
         {isOpen && (
-          <div className="md:hidden pb-8 pt-2 space-y-2">
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link 
-                  key={link.name}
-                  href={link.href} 
-                  onClick={() => setIsOpen(false)}
-                  className={`block px-4 py-3 rounded-xl text-base font-bold transition-all ${
-                    isActive 
-                    ? 'bg-[#21B7E2]/10 text-[#21B7E2] border-l-4 border-[#21B7E2]' 
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
-            
-            <div className="flex flex-col gap-3 pt-4 px-2">
-              <Link onClick={() => setIsOpen(false)} href="/login" className="border border-gray-700 text-gray-300 font-bold py-3 rounded-xl text-center hover:border-[#21B7E2]">
-                Login
+          <div className="md:hidden pb-8 space-y-4 animate-in slide-in-from-top duration-300">
+            {navLinks.map((link) => (
+              <Link key={link.name} href={link.href} onClick={() => setIsOpen(false)} 
+                className={`block px-4 py-3 rounded-xl text-base font-bold ${pathname === link.href ? 'bg-[#21B7E2]/10 text-[#21B7E2] border-l-4 border-[#21B7E2]' : 'text-gray-400'}`}>
+                {link.name}
               </Link>
-              <Link onClick={() => setIsOpen(false)} href="/register" className="bg-[#21B7E2] text-[#050816] px-6 py-3 rounded-xl font-bold text-center">
-                Register
-              </Link>
+            ))}
+            <hr className="border-gray-800" />
+            <div className="px-4">
+              {session ? (
+                <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-3 rounded-xl font-bold">
+                  <LogOut size={18} /> Logout
+                </button>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Link href="/login" onClick={() => setIsOpen(false)} className="text-center font-bold text-gray-400">Login</Link>
+                  <Link href="/register" onClick={() => setIsOpen(false)} className="bg-[#21B7E2] text-[#050816] py-3 rounded-xl font-bold text-center">Register</Link>
+                </div>
+              )}
             </div>
           </div>
         )}
