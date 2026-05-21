@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import Navbar from '@/components/Navbar';
+
 import DoctorCard from '@/components/DoctorCard';
 import Loader from '@/components/Loader'; 
 import { Search } from 'lucide-react';
@@ -11,14 +11,11 @@ export default function AllDoctorsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("All");
 
-  
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      
       const response = await fetch('/data/all-doctors.json');
       if (!response.ok) throw new Error("Failed to fetch data");
-      
       const data = await response.json();
       setDoctors(data.doctors);
     } catch (error) {
@@ -32,12 +29,10 @@ export default function AllDoctorsPage() {
     fetchDoctors();
   }, []);
 
-  
   const specialties = useMemo(() => {
     return ["All", ...new Set(doctors.map(d => d.specialty))];
   }, [doctors]);
 
-  
   const filteredDoctors = useMemo(() => {
     return doctors.filter(doc => {
       const matchesSearch = doc.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -47,22 +42,24 @@ export default function AllDoctorsPage() {
   }, [searchTerm, selectedSpecialty, doctors]);
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-[#050816] text-white">
 
-      <div className="max-w-[80%] mx-auto py-12">
+      <div className="max-w-[80%] mx-auto py-16">
         
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 font-serif">DocAppoint Specialists</h1>
-            <p className="text-gray-500 mt-1">Find and book appointments with top doctors.</p>
+            <h1 className="text-4xl md:text-5xl font-bold font-serif">
+              Our <span className="text-[#21B7E2]">Specialists</span>
+            </h1>
+            <p className="text-gray-400 mt-2">Browse through our verified medical experts.</p>
           </div>
-          {/* searching bar */}
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          {/* seaching bar */}
+          <div className="relative w-full md:w-[400px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
             <input 
               type="text" 
               placeholder="Search by doctor name..." 
-              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 outline-none focus:ring-2 focus:ring-[#21B7E2] shadow-sm transition-all"
+              className="w-full bg-[#0a0f20] text-white pl-12 pr-4 py-4 rounded-2xl border border-gray-800 outline-none focus:ring-2 focus:ring-[#21B7E2] focus:border-transparent transition-all placeholder:text-gray-600 shadow-2xl"
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
@@ -70,15 +67,15 @@ export default function AllDoctorsPage() {
 
         
         {!loading && (
-          <div className="flex flex-wrap gap-2 mb-10">
+          <div className="flex flex-wrap gap-3 mb-12">
             {specialties.map(s => (
               <button
                 key={s}
                 onClick={() => setSelectedSpecialty(s)}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
+                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all border ${
                   selectedSpecialty === s 
-                  ? "bg-[#21B7E2] text-white shadow-lg shadow-cyan-100" 
-                  : "bg-white text-gray-600 border border-gray-100 hover:border-[#21B7E2]"
+                  ? "bg-[#21B7E2] text-[#050816] border-[#21B7E2] shadow-lg shadow-cyan-500/20" 
+                  : "bg-transparent text-gray-400 border-gray-800 hover:border-[#21B7E2] hover:text-[#21B7E2]"
                 }`}
               >
                 {s}
@@ -87,9 +84,9 @@ export default function AllDoctorsPage() {
           </div>
         )}
 
-        
+        {/* doctor list  */}
         {loading ? (
-          <Loader /> 
+          <div className="py-20"><Loader /></div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -99,8 +96,14 @@ export default function AllDoctorsPage() {
             </div>
             
             {filteredDoctors.length === 0 && (
-              <div className="text-center py-20">
-                <p className="text-gray-400 text-xl">No doctors found matching your search.</p>
+              <div className="text-center py-32 border border-dashed border-gray-800 rounded-[3rem]">
+                <p className="text-gray-500 text-xl font-medium">No specialists found matching your criteria.</p>
+                <button 
+                   onClick={() => {setSearchTerm(""); setSelectedSpecialty("All")}}
+                   className="mt-4 text-[#21B7E2] hover:underline"
+                >
+                    Clear all filters
+                </button>
               </div>
             )}
           </>
