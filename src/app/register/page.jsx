@@ -13,26 +13,29 @@ const RegisterPage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     const name = e.target.name.value;
     const email = e.target.email.value;
     const password = e.target.password.value;
+    const imageUrl = e.target.image.value; // ইমেজ ইউআরএল ভ্যালু নেওয়া হচ্ছে
 
-    const { data, error } = await authClient.signUp.email({
+    await authClient.signUp.email({
         email, 
         password, 
         name, 
-        callbackURL: "/dashboard"
+        // যদি ইউজার ইউআরএল দেয় তবে সেটি নিবে, নাহলে অবতার জেনারেট করবে
+        image: imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+    }, {
+        onRequest: () => setLoading(true),
+        onSuccess: () => {
+          toast.success("Account created! Welcome to DocAppoint", { theme: "dark" });
+          router.push('/login');
+          router.refresh();
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message || "Registration failed", { theme: "dark" });
+          setLoading(false);
+        }
     });
-
-    if (!error) {
-      toast.success("Account created! Welcome to DocAppoint", { theme: "dark" });
-      router.push('/dashboard'); 
-    } else {
-      toast.error(error.message || "Registration failed");
-    }
-    setLoading(false);
   };
 
   return (
@@ -52,21 +55,30 @@ const RegisterPage = () => {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
+          {/* Full Name */}
           <div className="relative group">
             <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#21B7E2] transition-colors" size={18} />
             <input required type="text" name="name" placeholder="Full Name" className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:ring-2 focus:ring-[#21B7E2]/50 transition-all placeholder:text-gray-600" />
           </div>
 
+          {/* Image URL Field */}
+          <div className="relative group">
+            <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#21B7E2] transition-colors" size={18} />
+            <input type="url" name="image" placeholder="Profile Image URL (Optional)" className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:ring-2 focus:ring-[#21B7E2]/50 transition-all placeholder:text-gray-600" />
+          </div>
+
+          {/* Email Address */}
           <div className="relative group">
             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#21B7E2] transition-colors" size={18} />
             <input required type="email" name="email" placeholder="Email Address" className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-4 pl-12 pr-4 text-sm text-white outline-none focus:ring-2 focus:ring-[#21B7E2]/50 transition-all placeholder:text-gray-600" />
           </div>
 
+          {/* Password */}
           <div className="relative group">
             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#21B7E2] transition-colors" size={18} />
             <input required minLength={6} type={showPassword ? "text" : "password"} name="password" placeholder="Password" className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-4 pl-12 pr-12 text-sm text-white outline-none focus:ring-2 focus:ring-[#21B7E2]/50 transition-all placeholder:text-gray-600" />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#21B7E2]">
-              {showPassword ? <Activity size={18} /> : <Activity size={18} className="rotate-90" />}
+              <Activity size={18} className={showPassword ? "" : "rotate-90"} />
             </button>
           </div>
 
@@ -76,7 +88,7 @@ const RegisterPage = () => {
         </form>
 
         <p className="text-center mt-8 text-gray-500 text-sm">
-          Already a member?
+          Already a member? 
           <Link href="/login" className="text-[#21B7E2] hover:underline font-bold ml-2">Login</Link>
         </p>
       </div>
