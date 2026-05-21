@@ -21,7 +21,7 @@ const Navbar = () => {
           {/*  Navbar Links */}
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="text-[#21B7E2] font-medium hover:text-white transition-colors">Home</Link>
-            <Link href="/appointments" className="text-gray-300 font-medium hover:text-white transition-colors">All Appointments</Link>
+            <Link href="/all-doctors" className="text-gray-300 font-medium hover:text-white transition-colors">All Doctors</Link>
             <Link href="/dashboard" className="text-gray-300 font-medium hover:text-white transition-colors">Dashboard</Link>
           </div>
 
