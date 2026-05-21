@@ -10,6 +10,7 @@ export default function AllDoctorsPage() {
   const [loading, setLoading] = useState(true); 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("All");
+  const [isBooked, setIsBooked] = useState(false);
 
   const fetchDoctors = async () => {
     try {
