@@ -40,7 +40,7 @@ const DoctorCard = ({ doc }) => {
           
           {/* View Details Link */}
           <Link 
-            href={`/doctors/${doc.id}`} 
+            href={`/all-doctors/${doc.id}`} 
             className="flex items-center gap-2 bg-[#21B7E2] hover:bg-blue-500 text-[#050816] px-5 py-2.5 rounded-xl font-bold text-sm transition-all transform active:scale-95"
           >
             View Details

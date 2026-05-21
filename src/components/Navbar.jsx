@@ -19,13 +19,13 @@ const Navbar = () => {
       <div className="max-w-[80%] mx-auto">
         <div className="flex items-center justify-between h-20">
           
-          {/* Logo Section */}
+          
           <Link href="/" className="flex items-center gap-2 shrink-0 group">
             <Activity className="text-[#21B7E2] w-8 h-8 group-hover:scale-110 transition-transform" />
             <span className="text-xl font-bold tracking-tight">DocAppoint</span>
           </Link>
 
-          {/* Desktop Navbar Links */}
+          
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -38,7 +38,7 @@ const Navbar = () => {
                   }`}
                 >
                   {link.name}
-                  {/* Desktop Active Bottom Border (Closer to text) */}
+                  
                   {isActive && (
                     <span className="absolute bottom-[-6px] left-0 w-full h-[2px] bg-[#21B7E2] shadow-[0_0_8px_#21B7E2]"></span>
                   )}
@@ -47,9 +47,9 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Auth Buttons */}
+          
           <div className="hidden md:flex items-center gap-5">
-            {/* Login Button with subtle outline */}
+            
             <Link 
               href="/login" 
               className={`text-sm font-bold px-5 py-2 rounded-full border transition-all duration-300 ${
@@ -61,7 +61,7 @@ const Navbar = () => {
               Login
             </Link>
 
-            {/* Register Button Solid */}
+            
             <Link 
               href="/register" 
               className="bg-[#21B7E2] hover:bg-white text-[#050816] px-6 py-2.5 rounded-full font-bold text-sm transition-all transform active:scale-95 shadow-lg shadow-cyan-500/10"
@@ -70,15 +70,15 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile menu icon */}
+          
           <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-2">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-2 hover:cursor-pointer">
               {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu bar */}
+        
         {isOpen && (
           <div className="md:hidden pb-8 pt-2 space-y-2">
             {navLinks.map((link) => {
