@@ -69,7 +69,7 @@ const Hero = () => {
             <div className="relative z-10 border border-white/20 rounded-[2rem] p-3 bg-white/5 backdrop-blur-sm">
               <div className="rounded-[1.2rem] overflow-hidden shadow-2xl">
                 <img 
-                  src="/heroDoctor.jpg" 
+                  src="/HeroDoctor.jpg" 
                   alt="Futuristic Healthcare Interface"
                   className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
                 />
