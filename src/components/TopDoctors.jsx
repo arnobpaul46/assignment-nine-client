@@ -13,7 +13,7 @@ const TopDoctors = () => {
         const fetchDoctorsFromDB = async () => {
             try {
                 
-                const response = await fetch('http://localhost:8000/all-doctors');
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/all-doctors`);
                 const data = await response.json();
 
                

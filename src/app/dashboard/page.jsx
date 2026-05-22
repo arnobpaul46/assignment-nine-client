@@ -22,7 +22,7 @@ const Dashboard = () => {
         if (!session?.user?.email) return;
         
         try {
-            const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI || "http://localhost:8000";
+            const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI ;
             const res = await fetch(`${backendUri}/my-appointments?email=${session.user.email}`);
             const data = await res.json();
             setAppointments(data);
@@ -45,7 +45,7 @@ const Dashboard = () => {
     const confirmDelete = async () => {
         if (!deleteId) return;
         try {
-            const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI || "http://localhost:8000";
+            const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI ;
             const res = await fetch(`${backendUri}/bookings/${deleteId}`, { method: 'DELETE' });
             if (res.ok) {
                 toast.error("Appointment Cancelled Successfully!");
@@ -62,7 +62,7 @@ const Dashboard = () => {
         if (!updateData || !updateData._id) return;
 
         try {
-            const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI || "http://localhost:8000";
+            const backendUri = process.env.NEXT_PUBLIC_BACKEND_URI ;
             const res = await fetch(`${backendUri}/bookings/${updateData._id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
