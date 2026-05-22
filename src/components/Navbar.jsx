@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Activity, Menu, X, LogOut } from 'lucide-react';
+import { Activity, Menu, X, LogOut, User } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 
 const Navbar = () => {
@@ -59,44 +59,44 @@ const Navbar = () => {
             })}
           </div>
 
-          
-          <div className="flex items-center gap-3 md:gap-6">
+
+          <div className="flex items-center gap-2 md:gap-6">
 
             
             {!mounted || isPending ? (
               <div className="w-8 h-8 rounded-full bg-gray-800 animate-pulse"></div>
             ) : session ? (
               
-              <div className="flex items-center gap-3 md:gap-5">
+              <div className="flex items-center gap-2 md:gap-5">
                 <Link href="/dashboard" className="group">
                   <div className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-[#21B7E2] overflow-hidden group-hover:scale-105 transition-all flex items-center justify-center bg-[#0a0f20]">
                     {session?.user?.image ? (
                       <img src={session.user.image} alt="User" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="font-black text-[#21B7E2] text-sm uppercase">
+                      <span className="font-black text-[#21B7E2] text-xs md:text-sm uppercase">
                         {session?.user?.name?.slice(0, 1)}
                       </span>
                     )}
                   </div>
                 </Link>
 
-
+                
                 <button onClick={handleLogout} className="hidden md:flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors">
                   <LogOut size={18} /> <span className="text-xs font-bold">Log Out</span>
                 </button>
               </div>
             ) : (
-
-              <div className="flex items-center gap-2 md:gap-4">
+              
+              <div className="hidden md:flex items-center gap-4">
                 <Link href="/login" className="text-xs font-bold text-gray-400 hover:text-white">Login</Link>
-                <Link href="/register" className="bg-[#21B7E2] text-[#050816] px-4 md:px-6 py-2 rounded-full font-bold text-[10px] md:text-xs hover:bg-white transition-all">Register</Link>
+                <Link href="/register" className="bg-[#21B7E2] text-[#050816] px-5 py-2 rounded-full font-bold text-xs hover:bg-white transition-all">Register</Link>
               </div>
             )}
 
             
             <div className="md:hidden flex items-center">
-              <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-1 hover:bg-gray-800 rounded-lg">
-                {isOpen ? <X size={26} /> : <Menu size={26} />}
+              <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-1">
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
             </div>
           </div>
@@ -104,8 +104,8 @@ const Navbar = () => {
 
         
         {isOpen && (
-          <div className="md:hidden pb-8 pt-2 space-y-2 animate-in slide-in-from-top duration-300">
-            <div className="space-y-1">
+          <div className="md:hidden pb-8 pt-2 space-y-2 animate-in slide-in-from-top duration-300 border-t border-gray-800 mt-2">
+            <div className="space-y-1 pt-4">
               {navLinks.map((link) => (
                 <Link key={link.name} href={link.href} onClick={() => setIsOpen(false)}
                   className={`block px-4 py-3 rounded-xl text-sm font-bold ${pathname === link.href ? 'bg-[#21B7E2]/10 text-[#21B7E2] border-l-4 border-[#21B7E2]' : 'text-gray-400'}`}>
@@ -114,13 +114,19 @@ const Navbar = () => {
               ))}
             </div>
 
-            {session && (
-              <div className="px-4 pt-4 border-t border-gray-800">
-                <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-3.5 rounded-xl font-bold text-sm hover:bg-red-500 hover:text-white transition-all">
+            
+            <div className="px-4 pt-4 mt-4 border-t border-gray-900">
+              {session ? (
+                <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-3.5 rounded-xl font-bold text-sm">
                   <LogOut size={18} /> Logout Account
                 </button>
-              </div>
-            )}
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <Link href="/login" onClick={() => setIsOpen(false)} className="text-center font-bold text-gray-400 py-3 border border-gray-800 rounded-xl">Login</Link>
+                  <Link href="/register" onClick={() => setIsOpen(false)} className="bg-[#21B7E2] text-[#050816] py-3.5 rounded-xl font-bold text-center">Register Now</Link>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
