@@ -7,13 +7,12 @@ import { authClient } from '@/lib/auth-client';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false); 
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
   const { data: session, isPending } = authClient.useSession();
 
-  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -48,13 +47,16 @@ const Navbar = () => {
 
           
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link key={link.name} href={link.href}
-                className={`relative text-sm font-bold transition-all duration-300 py-1 ${pathname === link.href ? 'text-[#21B7E2]' : 'text-gray-400 hover:text-white'}`}>
-                {link.name}
-                {pathname === link.href && <span className="absolute bottom-[-4px] left-0 w-full h-[2px] bg-[#21B7E2] shadow-[0_0_8px_#21B7E2]"></span>}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link key={link.name} href={link.href}
+                  className={`relative text-sm font-bold transition-all duration-300 py-1 ${isActive ? 'text-[#21B7E2]' : 'text-gray-400 hover:text-white'}`}>
+                  {link.name}
+                  {isActive && <span className="absolute bottom-[-4px] left-0 w-full h-[2px] bg-[#21B7E2] shadow-[0_0_8px_#21B7E2]"></span>}
+                </Link>
+              );
+            })}
           </div>
 
           
@@ -66,29 +68,25 @@ const Navbar = () => {
             ) : session ? (
               
               <div className="flex items-center gap-3 md:gap-5">
-                <Link href="/dashboard" className="flex items-center gap-2 group">
-                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-[#21B7E2] overflow-hidden group-hover:scale-105 transition-all">
+                <Link href="/dashboard" className="group">
+                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-[#21B7E2] overflow-hidden group-hover:scale-105 transition-all flex items-center justify-center bg-[#0a0f20]">
                     {session?.user?.image ? (
-                      <img
-                        src={session.user.image}
-                        alt="User"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={session.user.image} alt="User" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-[#0a0f20] flex items-center justify-center font-black text-[#21B7E2] text-lg">
-
-                        {session?.user?.name ? session.user.name.slice(0, 1).toUpperCase():"U"}
-                      </div>
+                      <span className="font-black text-[#21B7E2] text-sm uppercase">
+                        {session?.user?.name?.slice(0, 1)}
+                      </span>
                     )}
                   </div>
                 </Link>
 
-                <button onClick={handleLogout} className="hidden md:flex justify-center items-center gap-2 text-gray-500 hover:text-red-500 transition-colors">
+
+                <button onClick={handleLogout} className="hidden md:flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors">
                   <LogOut size={18} /> <span className="text-xs font-bold">Log Out</span>
                 </button>
               </div>
             ) : (
-              
+
               <div className="flex items-center gap-2 md:gap-4">
                 <Link href="/login" className="text-xs font-bold text-gray-400 hover:text-white">Login</Link>
                 <Link href="/register" className="bg-[#21B7E2] text-[#050816] px-4 md:px-6 py-2 rounded-full font-bold text-[10px] md:text-xs hover:bg-white transition-all">Register</Link>
@@ -96,8 +94,8 @@ const Navbar = () => {
             )}
 
             
-            <div className="md:hidden flex items-center ml-1">
-              <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-1">
+            <div className="md:hidden flex items-center">
+              <button onClick={() => setIsOpen(!isOpen)} className="text-gray-300 p-1 hover:bg-gray-800 rounded-lg">
                 {isOpen ? <X size={26} /> : <Menu size={26} />}
               </button>
             </div>
@@ -118,7 +116,7 @@ const Navbar = () => {
 
             {session && (
               <div className="px-4 pt-4 border-t border-gray-800">
-                <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-3.5 rounded-xl font-bold text-sm">
+                <button onClick={handleLogout} className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-3.5 rounded-xl font-bold text-sm hover:bg-red-500 hover:text-white transition-all">
                   <LogOut size={18} /> Logout Account
                 </button>
               </div>
