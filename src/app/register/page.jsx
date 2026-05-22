@@ -23,7 +23,7 @@ const RegisterPage = () => {
         password, 
         name, 
         
-        image: imageUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
+        image: imageUrl ,
     }, {
         onRequest: () => setLoading(true),
         onSuccess: () => {

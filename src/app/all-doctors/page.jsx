@@ -15,10 +15,11 @@ export default function AllDoctorsPage() {
   const fetchDoctors = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/data/all-doctors.json');
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/all-doctors`);
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
-      setDoctors(data.doctors);
+      setDoctors(data);
     } catch (error) {
       console.error("Error:", error);
     } finally {

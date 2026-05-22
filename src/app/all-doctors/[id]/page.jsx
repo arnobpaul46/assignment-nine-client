@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Loader from '@/components/Loader';
-import { Star, MapPin, Briefcase, Building, Clock, CalendarCheck, Wallet, BadgeCheck } from 'lucide-react';
+import { Star, MapPin, Building, Clock, CalendarCheck, Wallet, BadgeCheck } from 'lucide-react';
 import BookingModal from '@/components/BookingModal';
 
 const DoctorDetails = () => {
@@ -10,23 +10,23 @@ const DoctorDetails = () => {
     const [doctor, setDoctor] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isBooked, setIsBooked] = useState(false); 
+    const [isBooked, setIsBooked] = useState(false);
 
     useEffect(() => {
-        const fetchAllData = async () => {
+        const fetchDoctorData = async () => {
+            if (!id) return; 
+
             try {
                 setLoading(true);
-                
-                const response = await fetch('/data/all-doctors.json');
-                const data = await response.json();
-                const foundDoctor = data.doctors.find(d => d.id === id);
-                setDoctor(foundDoctor);
 
                 
-                const appointments = JSON.parse(localStorage.getItem('appointments') || '[]');
-                const alreadyBooked = appointments.find(app => app.doctorId === id);
-                if (alreadyBooked) {
-                    setIsBooked(true);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/all-doctors/${id}`);
+                const data = await response.json();
+
+                if (data.message) {
+                    setDoctor(null);
+                } else {
+                    setDoctor(data);
                 }
             } catch (error) {
                 console.error("Error:", error);
@@ -35,7 +35,7 @@ const DoctorDetails = () => {
             }
         };
 
-        fetchAllData();
+        fetchDoctorData();
     }, [id]);
 
     if (loading) return <Loader />;
@@ -46,7 +46,7 @@ const DoctorDetails = () => {
             <div className="max-w-[90%] lg:max-w-[80%] mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
 
-                    
+
                     <div className="lg:col-span-4">
                         <div className="relative rounded-[2rem] overflow-hidden border border-gray-800 shadow-2xl shadow-cyan-500/5">
                             <img
@@ -57,7 +57,7 @@ const DoctorDetails = () => {
                         </div>
                     </div>
 
-                    
+
                     <div className="lg:col-span-8 flex flex-col justify-center">
                         <div className="">
                             <span className="bg-[#21B7E2]/10 text-[#21B7E2] px-4 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border border-[#21B7E2]/20">
@@ -77,7 +77,7 @@ const DoctorDetails = () => {
                             {doctor.description}
                         </p>
 
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                             <div className="bg-[#0a0f20] border border-gray-800 p-5 rounded-2xl flex items-center gap-4">
                                 <div className="bg-[#21B7E2]/10 p-3 rounded-xl text-[#21B7E2]">
@@ -117,7 +117,7 @@ const DoctorDetails = () => {
                             </div>
                         </div>
 
-                        
+
                         <div className="mb-6">
                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                 <CalendarCheck size={20} className="text-[#21B7E2]" />
@@ -135,15 +135,14 @@ const DoctorDetails = () => {
                             </div>
                         </div>
 
-                        
+
                         <button
                             disabled={isBooked}
                             onClick={() => isBooked ? null : setIsModalOpen(true)}
-                            className={`w-full py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${
-                                isBooked
-                                ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-70 border border-gray-700"
-                                : "bg-[#21B7E2] text-[#050816] hover:bg-white shadow-xl shadow-cyan-500/10"
-                            }`}
+                            className={`w-full py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 ${isBooked
+                                    ? "bg-gray-800 text-gray-500 cursor-not-allowed opacity-70 border border-gray-700"
+                                    : "bg-[#21B7E2] text-[#050816] hover:bg-white shadow-xl shadow-cyan-500/10"
+                                }`}
                         >
                             {isBooked ? (
                                 <><BadgeCheck size={20} /> Appointment Already Booked</>
@@ -152,7 +151,7 @@ const DoctorDetails = () => {
                             )}
                         </button>
 
-                        
+
                         {doctor && (
                             <BookingModal
                                 doctor={doctor}
