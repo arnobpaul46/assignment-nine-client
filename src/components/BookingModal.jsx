@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Calendar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
 import { toast } from 'react-toastify';
@@ -21,10 +21,10 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
         if (!session) return toast.error("Please login first!");
 
-        
+        const token = localStorage.getItem('access-token');
+
         const appointmentData = {
             userEmail: session.user.email,
             doctorName: doctor.name,
@@ -39,23 +39,23 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/bookings`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}` 
+                },
                 body: JSON.stringify(appointmentData)
             });
 
             if (response.ok) {
-                toast.success("Appointment Booked Successfully!",{
-                    theme: "dark",
-                });
+                toast.success("Appointment Booked Successfully!", { theme: "dark" });
                 onClose();
                 router.push("/dashboard");
                 
             } else {
-                toast.error("Failed to book appointment");
+                toast.error("Unauthorized: Please Login Again!");
             }
         } catch (error) {
-            console.error("Error:", error);
-            toast.error("Server connection failed!");
+            toast.error("Server Error!");
         }
     };
 
@@ -78,11 +78,13 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
-                            <input type="date" required className="w-1/2 bg-[#050816] border border-gray-800 rounded-2xl py-3 px-6 outline-none focus:ring-2 focus:ring-[#21B7E2] text-white" onChange={(e) => setFormData({ ...formData, appointmentDate: e.target.value })} />
+                            <div className="relative w-1/2">
+                                <Calendar size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#21B7E2] pointer-events-none" />
+                                <input type="date" required className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-3 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#21B7E2] text-white" onChange={(e) => setFormData({ ...formData, appointmentDate: e.target.value })} />
+                            </div>
                         </div>
 
                         <input type="number" placeholder="Phone Number" required className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-3 px-6 outline-none focus:ring-2 focus:ring-[#21B7E2] text-white" onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
-                        
                         <textarea placeholder="Write your problem..." required rows="2" className="w-full bg-[#050816] border border-gray-800 rounded-2xl py-3 px-6 outline-none focus:ring-2 focus:ring-[#21B7E2] text-white resize-none" onChange={(e) => setFormData({ ...formData, problem: e.target.value })}></textarea>
 
                         <div>
@@ -93,7 +95,6 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
                                 ))}
                             </div>
                         </div>
-
                         <button type="submit" className="w-full bg-[#21B7E2] text-[#050816] py-4 rounded-2xl font-black text-lg active:scale-95 transition-transform">Complete Appointment</button>
                     </form>
                 </div>

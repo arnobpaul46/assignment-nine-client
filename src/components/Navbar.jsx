@@ -12,13 +12,33 @@ const Navbar = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
+  
   useEffect(() => {
     setMounted(true);
-  }, []);
+    const getJwtToken = async () => {
+      if (session?.user?.email) {
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/jwt`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: session.user.email })
+          });
+          const data = await res.json();
+          if (data.token) {
+            localStorage.setItem('access-token', data.token);
+          }
+        } catch (err) {
+          console.error("JWT Fetch Error:", err);
+        }
+      }
+    };
+    getJwtToken();
+  }, [session]);
 
   const handleLogout = async () => {
     await authClient.signOut({
       onSuccess: () => {
+        localStorage.removeItem('access-token'); 
         router.push("/login");
         setIsOpen(false);
       },
@@ -27,7 +47,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "All Doctors", href: "/doctors" },
+    { name: "All Doctors", href: "/all-doctors" },
     { name: "Dashboard", href: "/dashboard" },
   ];
 
@@ -69,8 +89,8 @@ const Navbar = () => {
                     )}
                   </div>
                 </Link>
-                <button onClick={handleLogout} className="hidden md:block text-gray-500 hover:text-red-500">
-                  <LogOut size={18} />
+                <button onClick={handleLogout} className="hidden md:flex items-center gap-1.5 text-gray-500 hover:text-red-500">
+                  <LogOut size={18} /> Logout
                 </button>
               </div>
             ) : (

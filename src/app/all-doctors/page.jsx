@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-
 import DoctorCard from '@/components/DoctorCard';
 import Loader from '@/components/Loader'; 
 import { Search } from 'lucide-react';
@@ -10,13 +9,23 @@ export default function AllDoctorsPage() {
   const [loading, setLoading] = useState(true); 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("All");
-  const [isBooked, setIsBooked] = useState(false);
 
   const fetchDoctors = async () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/all-doctors`);
+      
+      const token = localStorage.getItem('access-token');
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/all-doctors`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          
+          'authorization': `Bearer ${token}`
+        }
+      });
+
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setDoctors(data);
@@ -32,6 +41,8 @@ export default function AllDoctorsPage() {
   }, []);
 
   const specialties = useMemo(() => {
+    
+    if (!doctors || doctors.length === 0) return ["All"];
     return ["All", ...new Set(doctors.map(d => d.specialty))];
   }, [doctors]);
 
@@ -45,7 +56,6 @@ export default function AllDoctorsPage() {
 
   return (
     <main className="min-h-screen bg-[#050816] text-white">
-
       <div className="max-w-[80%] mx-auto py-16">
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-16">
@@ -55,7 +65,7 @@ export default function AllDoctorsPage() {
             </h1>
             <p className="text-gray-400 mt-2">Browse through our verified medical experts.</p>
           </div>
-          {/* seaching bar */}
+          
           <div className="relative w-full md:w-[400px]">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
             <input 
@@ -67,7 +77,6 @@ export default function AllDoctorsPage() {
           </div>
         </div>
 
-        
         {!loading && (
           <div className="flex flex-wrap gap-3 mb-12">
             {specialties.map(s => (
@@ -86,14 +95,14 @@ export default function AllDoctorsPage() {
           </div>
         )}
 
-        {/* doctor list  */}
         {loading ? (
           <div className="py-20"><Loader /></div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {filteredDoctors.map(doc => (
-                <DoctorCard key={doc.id} doc={doc} />
+                
+                <DoctorCard key={doc.id || doc._id} doc={doc} />
               ))}
             </div>
             
