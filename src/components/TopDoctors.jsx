@@ -36,7 +36,7 @@ const TopDoctors = () => {
                 });
 
                 
-                setDoctors(topDoctorsList.sort((a, b) => b.rating - a.rating).slice(0, 6));
+                setDoctors(topDoctorsList.sort((a, b) => b.rating - a.rating).slice(0, 3));
             } catch (error) {
                 console.error("Fetch Error in TopDoctors:", error);
             } finally {
