@@ -82,7 +82,7 @@ const RegisterPage = () => {
             </button>
           </div>
 
-          <button disabled={loading} type="submit" className="w-full py-4 bg-[#21B7E2] text-[#050816] font-black rounded-2xl shadow-lg shadow-cyan-500/20 hover:bg-white transition-all text-lg active:scale-95 disabled:opacity-50">
+          <button disabled={loading} type="submit" className="w-full py-4 bg-[#21B7E2] text-[#050816] font-black rounded-2xl shadow-lg shadow-cyan-500/20 hover:bg-blue-500 transition-all text-lg active:scale-95 disabled:opacity-50">
             {loading ? "Creating..." : "Create Account"}
           </button>
         </form>

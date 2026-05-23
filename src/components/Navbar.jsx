@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, Menu, X, LogOut, User } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +13,6 @@ const Navbar = () => {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
 
-  
   useEffect(() => {
     setMounted(true);
     const getJwtToken = async () => {
@@ -37,10 +37,21 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     await authClient.signOut({
-      onSuccess: () => {
-        localStorage.removeItem('access-token'); 
-        router.push("/login");
-        setIsOpen(false);
+      fetchOptions: {
+        onSuccess: () => {
+          localStorage.removeItem('access-token');
+          toast.success("Logged out successfully", {
+            theme: "dark",
+            
+          });
+          router.push("/login");
+          setIsOpen(false);
+        },
+        onError: (ctx) => {
+          toast.error(ctx.error.message, {
+            theme: "dark"
+          });
+        }
       },
     });
   };
@@ -96,7 +107,7 @@ const Navbar = () => {
             ) : (
               <div className="hidden md:flex items-center gap-4">
                 <Link href="/login" className="text-xs font-bold text-gray-400">Login</Link>
-                <Link href="/register" className="bg-[#21B7E2] text-[#050816] px-5 py-2 rounded-full font-bold text-xs">Register</Link>
+                <Link href="/register" className="bg-[#21B7E2] text-[#050816] px-5 py-2 rounded-full font-bold text-xs hover:bg-blue-500 transition-all">Register</Link>
               </div>
             )}
 
